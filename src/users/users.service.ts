@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateUserDto  } from './dto/create-user.dto'
 
 @Injectable()
 export class UsersService {
@@ -53,12 +54,16 @@ export class UsersService {
   }
 
   findOne(id: number) {
-    return this.users.filter((user) => {
+    const requestedUsers = this.users.filter((user) => {
       return user.id === id
     })
+
+    if(requestedUsers.length == 0) {
+      throw new NotFoundException('User not found')
+    }
   }
 
-  create(user: {name: string, email: string, role: "INTERN" | "ADMIN" | 'ENGINEER'}) {
+  create(user: CreateUserDto) {
     const userByHighestId = this.users.reduce((accum, user) => {
       return Math.max(accum, user.id);
     }, 0)
